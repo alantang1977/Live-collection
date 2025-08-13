@@ -1,0 +1,184 @@
+# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
+
+name: Deploy IPTV Home Pages
+
+on:
+  # 在针对 `main` 分支的推送上运行。如果您
+  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
+  # push:
+  #   branches: [main]
+  schedule:
+    # 设置启动时间，为 UTC 时间, UTC 2点 对应 北京时间早上 10 点
+    - cron : '58 01 * * *'
+  # 允许您从 Actions 选项卡手动运行此工作流程
+  workflow_dispatch:
+
+# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages 并允许更改储存库
+permissions:
+  contents: write # 允许更改储存库
+  pages: write
+  id-token: write
+
+# 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列
+# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # 构建工作
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: 克隆自己的仓库
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: 下载文件
+      - name: Download file
+        run: |
+          mkdir -p temp
+          wget --retry-connrefused  -O temp/fanmingming-ipv6.m3u https://raw.githubusercontent.com/fanmingming/live/refs/heads/main/tv/m3u/ipv6.m3u
+          wget --retry-connrefused  -O temp/YanG-1989-Gather.m3u https://raw.githubusercontent.com/YanG-1989/m3u/main/Gather.m3u
+          wget --retry-connrefused  -O temp/iptv-org-index.m3u https://iptv-org.github.io/iptv/index.m3u
+          wget --retry-connrefused  -O temp/joevess-iptv_sources.m3u8 https://raw.githubusercontent.com/joevess/IPTV/main/sources/iptv_sources.m3u8
+          wget --retry-connrefused  -O temp/YueChan-APTV.m3u https://raw.githubusercontent.com/YueChan/Live/refs/heads/main/APTV.m3u
+          wget --retry-connrefused  -O temp/Guovin-result.m3u https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u
+          wget --retry-connrefused  -O temp/vbskycn-iptv4.m3u https://raw.githubusercontent.com/vbskycn/iptv/refs/heads/master/tv/iptv4.m3u
+          wget --retry-connrefused  -O temp/vbskycn-iptv6.m3u https://raw.githubusercontent.com/vbskycn/iptv/refs/heads/master/tv/iptv6.m3u
+
+      # Step 3: 移动文件到 fanmingming 文件夹（自动创建或覆盖）
+      - name: Move file to folder fanmingming
+        run: |
+          TARGET_FOLDER=fanmingming
+          TARGET_FILE=$TARGET_FOLDER/ipv6.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/fanmingming-ipv6.m3u $TARGET_FILE
+
+      # Step 3: 移动文件到 YanG-1989 文件夹（自动创建或覆盖）
+      - name: Move file to folder YanG-1989
+        run: |
+          TARGET_FOLDER=YanG-1989
+          TARGET_FILE=$TARGET_FOLDER/Gather.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/YanG-1989-Gather.m3u $TARGET_FILE
+
+      # Step 3: 移动文件到 iptv-org 文件夹（自动创建或覆盖）
+      - name: Move file to folder iptv-org
+        run: |
+          TARGET_FOLDER=iptv-org
+          TARGET_FILE=$TARGET_FOLDER/index.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/iptv-org-index.m3u $TARGET_FILE
+
+      # Step 3: 移动文件到 joevess 文件夹（自动创建或覆盖）
+      - name: Move file to folder joevess
+        run: |
+          TARGET_FOLDER=joevess
+          TARGET_FILE=$TARGET_FOLDER/iptv_sources.m3u8
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/joevess-iptv_sources.m3u8 $TARGET_FILE
+
+      # Step 3: 移动文件到 YueChan 文件夹（自动创建或覆盖）
+      - name: Move file to folder YueChan
+        run: |
+          TARGET_FOLDER=YueChan
+          TARGET_FILE=$TARGET_FOLDER/APTV.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/YueChan-APTV.m3u $TARGET_FILE
+
+      # Step 3: 移动文件到 Guovin 文件夹（自动创建或覆盖）
+      - name: Move file to folder Guovin
+        run: |
+          TARGET_FOLDER=Guovin
+          TARGET_FILE=$TARGET_FOLDER/result.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/Guovin-result.m3u $TARGET_FILE
+
+      # Step 3: 移动文件到 vbskycn 文件夹（自动创建或覆盖）
+      - name: Move file to folder vbskycn
+        run: |
+          TARGET_FOLDER=vbskycn
+          TARGET_FILE=$TARGET_FOLDER/iptv4.m3u
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/vbskycn-iptv4.m3u $TARGET_FILE
+
+          TARGET_FILE=$TARGET_FOLDER/iptv6.m3u
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/vbskycn-iptv6.m3u $TARGET_FILE
+
+      # Step 4: 提交并推送更改
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add fanmingming/
+          git add YanG-1989/
+          git add iptv-org/
+          git add joevess/
+          git add YueChan/
+          git add Guovin/
+          git add vbskycn/
+          
+
+          git commit -m "Update in folder" || echo "No changes to commit"
+          git push origin main
+
+      # 使用 Pandoc 将 README.md 转换为 index.html
+      - name: Convert README.md to index.html
+        run: |
+          sudo apt-get install pandoc
+          pandoc README.md -f markdown -t html -s -o index.html --metadata title="IPTV"
+
+      # 部署页面
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./
+
+  # 部署工作
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
