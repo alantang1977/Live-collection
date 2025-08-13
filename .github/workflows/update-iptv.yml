@@ -46,6 +46,19 @@ jobs:
           wget --retry-connrefused  -O temp/Guovin-result.m3u https://raw.githubusercontent.com/Guovin/iptv-api/gd/output/result.m3u
           wget --retry-connrefused  -O temp/vbskycn-iptv4.m3u https://raw.githubusercontent.com/vbskycn/iptv/refs/heads/master/tv/iptv4.m3u
           wget --retry-connrefused  -O temp/vbskycn-iptv6.m3u https://raw.githubusercontent.com/vbskycn/iptv/refs/heads/master/tv/iptv6.m3u
+          wget --retry-connrefused  -O temp/junchao-json.txt https://gitee.com/junchao321/cinematography/raw/master/json.txt
+          
+      # Step 3: 移动文件到 junchao 文件夹（自动创建或覆盖）
+      - name: Move file to folder junchao
+        run: |
+          TARGET_FOLDER=junchao
+          TARGET_FILE=$TARGET_FOLDER/json.txt
+
+          # 确保目标文件夹存在
+          mkdir -p $TARGET_FOLDER
+
+          # 覆盖同名文件（无需额外检查）
+          mv temp/junchao-json.txt $TARGET_FILE
 
       # Step 3: 移动文件到 fanmingming 文件夹（自动创建或覆盖）
       - name: Move file to folder fanmingming
