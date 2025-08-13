@@ -164,7 +164,7 @@ jobs:
           git add YueChan/
           git add Guovin/
           git add vbskycn/
-          
+          git add junchao/
 
           git commit -m "Update in folder" || echo "No changes to commit"
           git push origin main
